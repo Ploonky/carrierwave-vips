@@ -129,6 +129,17 @@ describe CarrierWave::Vips do
       VIPS::Image.new(@instance.current_path).exif.should_not include 'ACD Systems Digital Imaging'
     end
   end
+  describe 'auto_orient' do
+    it "based upon the exif orientation rotate the photo to be right-side-up" do
+      @instance.auto_orient      
+      @instance.process!
+      #should have correct dimentions and exif value
+      image = VIPS::Image.new(@instance.current_path)
+      image.exif?.should include true
+      orientation = image.get("exif-ifd0-Orientation")[0]
+      orientation.to_i.should include 1
+    end
+  end
 
   describe '#process!', :slow => true do
     it "does not run out of file descriptors on long batch runs" do

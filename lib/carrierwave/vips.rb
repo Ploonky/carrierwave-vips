@@ -69,6 +69,38 @@ module CarrierWave
     end
 
     ##
+    # Check the exif tags and if they exist rotate the image
+
+    def auto_orient
+      manipulate! do |image|
+        if image.exif?
+          orientation = image.get("exif-ifd0-Orientation")[0]
+          puts orientation
+          image ||= if orientation==1
+            image
+          elsif orientation==2
+            image.fliphor
+          elsif orientation==3
+            image.rot180
+          elsif orientation==4
+            image.rot180.fliphor
+          elsif orientation==5
+            image.rot90.fliphor
+          elsif orientation==6
+            image.rot270
+          elsif orientation==7
+            image.rot270.fliphor
+          elsif orientation==8
+            image.rot90.flipver
+          else
+            image
+          end
+        end
+        image
+      end
+    end
+
+    ##
     # Convert the file to a different format
     #
     #
@@ -175,13 +207,7 @@ module CarrierWave
 
     def manipulate!
       cache_stored_file! unless cached?
-      @_vimage ||= if jpeg?
-          VIPS::Image.jpeg(current_path, :sequential => true)
-        elsif png?
-          VIPS::Image.png(current_path, :sequential => true)
-        else
-          VIPS::Image.new(current_path)
-        end
+      @_vimage = VIPS::Image.new(current_path)
       @_vimage = yield @_vimage
     rescue => e
       raise CarrierWave::ProcessingError.new("Failed to manipulate file, maybe it is not a supported image? Original Error: #{e}")
