@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 gemspec
 
-gem 'rmagick'
+gem 'rmagick', :require => 'RMagick'
 gem 'carrierwave'
 gem 'carrierwave-datamapper', :require => 'carrierwave/datamapper'
 gem 'ruby-vips', :require => 'vips'

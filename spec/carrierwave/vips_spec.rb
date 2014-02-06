@@ -135,7 +135,7 @@ describe CarrierWave::Vips do
       @instance.process!
       #should have correct dimentions and exif value
       image = VIPS::Image.new(@instance.current_path)
-      image.exif?.should include true
+      image.exif?.should be(true)
       orientation = image.get("exif-ifd0-Orientation")[0]
       orientation.to_i.should include 1
     end

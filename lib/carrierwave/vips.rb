@@ -72,29 +72,36 @@ module CarrierWave
     # Check the exif tags and if they exist rotate the image
 
     def auto_orient
+      puts "Here"
       manipulate! do |image|
         if image.exif?
-          orientation = image.get("exif-ifd0-Orientation")[0]
-          puts orientation
-          image ||= if orientation==1
-            image
-          elsif orientation==2
-            image.fliphor
-          elsif orientation==3
-            image.rot180
-          elsif orientation==4
-            image.rot180.fliphor
-          elsif orientation==5
-            image.rot90.fliphor
-          elsif orientation==6
-            image.rot270
-          elsif orientation==7
-            image.rot270.fliphor
-          elsif orientation==8
-            image.rot90.flipver
-          else
-            image
+          #work around until i can find a way to do this purely in VIPS
+          rimage = Magick::Image.read(image.filename).first
+          begin
+            orientation = rimage.get_exif_by_entry("Orientation")[0][1].to_i
+          rescue
+            orientation = 1
           end
+          if orientation==1
+            image=image
+          elsif orientation==2
+            image=image.fliphor
+          elsif orientation==3
+            image=image.rot180
+          elsif orientation==4
+            image=image.rot180.fliphor
+          elsif orientation==5
+            image=image.rot90.fliphor
+          elsif orientation==6
+            image=image.rot90
+          elsif orientation==7
+            image=image.rot270.fliphor
+          elsif orientation==8
+            image=image.rot90.flipver.fliphor
+          else
+            image=image
+          end
+            image.set("exif-ifd0-Orientation","1")
         end
         image
       end
