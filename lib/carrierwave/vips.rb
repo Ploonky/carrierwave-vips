@@ -186,7 +186,7 @@ module CarrierWave
     #
     def resize_to_limit(new_width, new_height)
       manipulate! do |image|
-        image = resize_image(image,new_width,new_height) if new_width < image.x_size || new_height < image.y_size
+        image = resize_image(image,new_width,new_height, :max) if new_width < image.x_size || new_height < image.y_size
         image
       end
     end
