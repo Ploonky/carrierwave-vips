@@ -101,7 +101,7 @@ module CarrierWave
           else
             image=image
           end
-            image=image.set("exif-ifd0-Orientation","1")
+            image.set("exif-Orientation","1")
         end
         image
       end
