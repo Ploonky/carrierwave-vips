@@ -72,7 +72,6 @@ module CarrierWave
     # Check the exif tags and if they exist rotate the image
 
     def auto_orient
-      puts "Here"
       manipulate! do |image|
         if image.exif?
           #work around until i can find a way to do this purely in VIPS
@@ -82,6 +81,7 @@ module CarrierWave
           rescue
             orientation = 1
           end
+          puts orientation
           if orientation==1
             image=image
           elsif orientation==2
@@ -101,7 +101,7 @@ module CarrierWave
           else
             image=image
           end
-            image.set("exif-ifd0-Orientation","1")
+            image=image.set("exif-ifd0-Orientation","1")
         end
         image
       end
@@ -217,6 +217,7 @@ module CarrierWave
       @_vimage = VIPS::Image.new(current_path)
       @_vimage = yield @_vimage
     rescue => e
+      puts "Failed to manipulate file, maybe it is not a supported image? Original Error: #{e.backtrace}"
       raise CarrierWave::ProcessingError.new("Failed to manipulate file, maybe it is not a supported image? Original Error: #{e}")
     end
 
